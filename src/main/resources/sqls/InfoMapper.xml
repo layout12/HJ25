@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.info">
+
+
+<select id="select_I_id" parameterType="string" resultType="string">
+SELECT I_ID FROM INFO WHERE I_ID = #{i_id}
+</select>
+
+<insert id="infoInsert" parameterType="InfoDto">
+INSERT INTO INFO VALUES(#{i_id},#{i_name},#{i_addr},#{i_detailAddr},#{i_postNo})
+ 
+</insert>
+  
+
+
+</mapper>

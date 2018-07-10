@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ <mapper namespace="com.oz.hj25.cart">
+
+<resultMap type="com.oz.hj25.dto.CartDto" id="CartMap">
+<result column="C_NO" property="c_no"/>
+<result column="I_ID" property="i_id"/>
+<result column="G_NO" property="g_no"/>
+<result column="C_AMT" property="c_amt"/>
+<result column="GT_NO" property="gt_no"/>
+<result column="G_NAME" property="g_name"/>
+<result column="G_PRICE" property="g_price"/>
+</resultMap>
+
+
+<select id="cartList" resultMap="CartMap">
+SELECT * FROM CART JOIN GOODS USING(G_NO) WHERE I_ID = #{i_id}
+</select>
+
+<select id="cartSelectOne" parameterType="CartDto" resultType="CartDto">
+SELECT * FROM CART WHERE I_ID =#{i_id} AND G_NO = #{g_no}
+</select>
+
+
+<insert id="cartInsert" parameterType="CartDto">
+INSERT INTO CART VALUES(CARTSEQ.NEXTVAL,#{i_id},#{g_no},#{c_amt})
+</insert>
+
+
+<update id="cartUpdate" parameterType="CartDto">
+UPDATE CART SET C_AMT = #{c_amt} WHERE C_NO = #{c_no}  
+</update>
+
+<delete id="cartDelete" parameterType="int">
+DELETE FROM CART WHERE C_NO =#{c_no}
+</delete>
+
+<delete id="cartAlldel">
+DELETE FROM CART WHERE I_ID = #{i_id} 
+</delete> 
+
+
+</mapper>
+

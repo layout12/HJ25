@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.user">
+<resultMap type="com.oz.hj25.dto.UserDto" id="UserMap">
+<result column="U_NO" property="u_no"/>
+<result column="U_NAME" property="u_name"/>
+<result column="I_ID" property="i_id"/>
+<result column="U_ID" property="u_id"/>
+<result column="U_PW" property="u_pw"/>
+<result column="U_ADDR" property="u_addr"/>
+<result column="U_PHONE" property="u_phone"/>
+<result column="U_GRADE" property="u_grade"/>
+<result column="U_ENABLED" property="u_enabled"/>
+<result column="U_EMAIL" property="u_email"/>
+</resultMap>
+
+<select id="UserList" resultMap="UserMap" parameterType="int">
+<![CDATA[
+SELECT * FROM
+(SELECT ROWNUM AS RN,A.U_NO,A.I_ID,A.U_NAME,A.U_ID,A.U_PW,A.U_ADDR,
+A.U_PHONE,A.U_GRADE,A.U_ENABLED,A.U_EMAIL FROM
+(SELECT ROWNUM,U_NO,I_ID,U_NAME,U_ID,U_PW,U_ADDR,U_PHONE,U_GRADE,U_ENABLED,U_EMAIL
+FROM USERS ORDER BY U_NO DESC)A
+WHERE ROWNUM <=#{pageNo}*10)
+WHERE #{pageNo}*10-9 <=RN
+]]>
+</select>
+
+<select id="UserSearchList" resultMap="UserMap" parameterType="map">
+<![CDATA[
+SELECT * FROM
+(SELECT ROWNUM AS RN,A.U_NO,A.I_ID,A.U_NAME,A.U_ID,A.U_PW,A.U_ADDR,
+A.U_PHONE,A.U_GRADE,A.U_ENABLED,A.U_EMAIL FROM
+(SELECT ROWNUM,U_NO,I_ID,U_NAME,U_ID,U_PW,U_ADDR,U_PHONE,U_GRADE,U_ENABLED,U_EMAIL
+FROM USERS WHERE UPPER(${option}) LIKE '%' || UPPER(#{input}) || '%' ORDER BY U_NO DESC)A
+WHERE ROWNUM <=#{pageNo}*10)
+WHERE #{pageNo}*10-9 <=RN
+]]>
+</select>
+
+<select id="UserDetail" parameterType="String" resultType="UserDto">
+SELECT * FROM USERS WHERE U_ID=#{u_id}
+</select>
+
+<insert id="UserInsert" parameterType="UserDto">
+INSERT INTO USERS VALUES(#{u_id},USERSSEQ.NEXTVAL,#{i_id},#{u_name},#{u_pw},#{u_addr},#{u_phone},'USER','Y',#{u_email})
+</insert>
+
+<update id="UserUpdate" parameterType="UserDto">
+UPDATE USERS SET U_PW=#{u_pw}, U_ADDR=#{u_addr}, U_PHONE=#{u_phone}, U_EMAIL=#{u_email} WHERE U_NO = #{u_no}
+</update>
+
+<update id="UserDelete" parameterType="int">
+UPDATE USERS SET U_ENABLED = 'N' WHERE U_NO = #{u_no}
+</update>
+
+
+<select id="UserCheck" parameterType="map" resultType="UserDto">
+SELECT * FROM USERS WHERE U_ID=#{u_id} AND U_PW=#{u_pw}
+</select>
+
+<!-- id찿기 -->
+<select id="UserIdSearch" parameterType="map" resultType="String">
+SELECT U_ID FROM USERS WHERE U_NAME=#{u_name} AND U_EMAIL = #{u_email}
+</select>
+
+<!-- 비밀번호 찿기 -->
+<select id="UserPwSearch" parameterType="UserDto" resultType="String">
+SELECT I_ID FROM USERS WHERE U_ID = #{u_id} AND U_NAME=#{u_name} AND U_EMAIL = #{u_email}
+</select>
+
+<!-- 비밀번호 변경 -->
+<update id="UserPwUpdate" parameterType="map"  >
+UPDATE USERS SET U_PW = #{u_pw} WHERE U_ID=#{u_id}
+</update>
+
+
+<select id="UdundantInspection" parameterType="map" resultType="string">
+SELECT U_NO FROM USERS WHERE ${column} = #{val}
+
+</select>
+
+<select id="UserTotal" resultType="int">
+SELECT COUNT(*) FROM USERS
+</select>
+
+<select id="UserSearchTotal" resultType="int" parameterType="map">
+SELECT COUNT(*) FROM USERS UPPER(${option}) LIKE '%' || UPPER(#{input}) || '%'
+</select>
+
+<update id="UserDrop" parameterType="map">
+UPDATE USERS SET U_ENABLED=#{u_enabled} WHERE U_ID=#{u_id}
+</update>
+<!-- SMS -->
+<select id="smsAll" resultMap="UserMap">
+SELECT U_ID,U_PHONE FROM USERS WHERE U_ENABLED='Y' AND I_ID NOT IN (SELECT I_ID FROM ORDERS WHERE SUBSTR(O_DATE,1,8) = SUBSTR(SYSDATE,1,8))
+</select>
+
+</mapper>

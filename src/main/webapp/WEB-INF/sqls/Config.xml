@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+
+	<typeAliases>
+		<typeAlias type="com.oz.hj25.dto.BoardDto" alias="BoardDto" />
+		<typeAlias type="com.oz.hj25.dto.AnswerDto" alias="AnswerDto" />
+		<typeAlias type="com.oz.hj25.dto.UserDto" alias="UserDto" />
+		<typeAlias type="com.oz.hj25.dto.InfoDto" alias="InfoDto" />
+		<typeAlias type="com.oz.hj25.dto.GoodsDto" alias="GoodsDto" />
+		<typeAlias type="com.oz.hj25.dto.OrdersDto" alias="OrdersDto" />
+		<typeAlias type="com.oz.hj25.dto.SaleDto" alias="SaleDto" />
+		<typeAlias type="com.oz.hj25.dto.StockDto" alias="StockDto" />
+		<typeAlias type="com.oz.hj25.dto.CartDto" alias="CartDto" />
+	</typeAliases>
+
+
+	<mappers>
+		<mapper resource="/sqls/BoardMapper.xml" />
+		<mapper resource="/sqls/AnswerMapper.xml" />
+		<mapper resource="/sqls/UserMapper.xml" />
+		<mapper resource="/sqls/InfoMapper.xml" />
+		<mapper resource="/sqls/GoodsMapper.xml" />
+		<mapper resource="/sqls/OrdersMapper.xml" />
+		<mapper resource="/sqls/SaleMapper.xml" />
+		<mapper resource="/sqls/StockMapper.xml" />
+		<mapper resource="/sqls/CartMapper.xml" />
+	</mappers>
+
+
+
+</configuration>

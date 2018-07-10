@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.orders">
+<resultMap type="com.oz.hj25.dto.OrdersDto" id="OrdersMap">
+<result column="O_NO" property="o_no"/>
+<result column="I_ID" property="i_id"/>
+<result column="G_NO" property="g_no"/>
+<result column="O_AMT" property="o_amt"/>
+<result column="O_DATE" property="o_date"/>
+<result column="CT_NO" property="ct_no"/>
+<result column="G_NAME" property="g_name"/>
+<result column="G_PRICE" property="g_price"/>
+</resultMap>
+<select id="ordersList" resultMap="OrdersMap" parameterType="int">
+SELECT * FROM GOODS JOIN ORDERS USING(G_NO) WHERE CT_NO=#{ct_no}
+</select>
+
+<select id="ordersSearch" resultMap="OrdersMap" parameterType="map">
+SELECT * FROM ORDERS JOIN GOODS USING(G_NO) WHERE I_ID=#{i_id} AND O_DATE LIKE #{o_inputDate} || '%'
+</select>
+
+<select id="ordersName" resultMap="OrdersMap" parameterType="String">
+SELECT * FROM ORDERS JOIN GOODS USING(G_NO) WHERE G_NAME LIKE #{o_inputName} || '%'
+</select>
+
+<select id="ordersDate" resultMap="OrdersMap">
+SELECT * FROM ORDERS JOIN GOODS USING(G_NO) WHERE O_DATE LIKE #{o_inputDate} || '%'
+</select>
+
+<delete id="ordersOneDelete" parameterType="OrdersDto">
+DELETE FROM ORDERS WHERE G_NO=#{g_no} AND I_ID=#{i_id} AND O_DATE LIKE TO_CHAR(SYSDATE,'YY/MM/DD')||'%'
+</delete>
+
+<delete id="ordersDelete" parameterType="String">
+DELETE FROM ORDERS WHERE I_ID=#{i_id} AND O_DATE LIKE TO_CHAR(SYSDATE,'YY/MM/DD')||'%'
+</delete>
+
+<update id="ordersUpdate" parameterType="OrdersDto">
+UPDATE ORDERS SET O_AMT=#{o_amt} WHERE G_NO=#{g_no} AND I_ID=#{i_id} AND O_DATE LIKE TO_CHAR(SYSDATE,'YY/MM/DD')||'%'
+</update>
+
+<insert id="ordersInsert" parameterType="OrdersDto">
+INSERT INTO ORDERS VALUES(ORDERSSEQ.NEXTVAL,#{i_id},#{g_no},#{o_amt},SYSDATE)
+</insert>
+
+</mapper>

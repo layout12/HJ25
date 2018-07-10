@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.board">
+<resultMap type="com.oz.hj25.dto.BoardDto" id="BoardMap">
+<result column="B_NO" property="b_no"/>
+<result column="U_ID" property="u_id"/>
+<result column="B_TITLE" property="b_title"/>
+<result column="B_CONTENT" property="b_content"/>
+<result column="B_DATE" property="b_date"/>
+<result column="B_HITS" property="b_hits"/>
+<result column="TOTAL" property="total"/>
+<result column="U_GRADE" property="u_grade"/>
+</resultMap>
+
+<select id="BoardList" resultMap="BoardMap" parameterType="int">
+<![CDATA[
+SELECT * FROM(SELECT ROWNUM AS RN,A.B_NO,A.U_ID,A.B_TITLE,A.B_CONTENT,A.B_DATE,A.B_HITS,TOTAL,U_GRADE FROM
+(SELECT ROWNUM,B_NO,U_ID,B_TITLE,B_CONTENT,B_DATE,B_HITS,
+(SELECT COUNT(*) FROM ANSWER WHERE B_NO=B.B_NO)AS TOTAL, (SELECT U_GRADE FROM USERS WHERE U_ID=B.U_ID)AS U_GRADE FROM BOARD B ORDER BY DECODE(U_GRADE, 'ADMIN', U_GRADE), B_NO DESC)A
+WHERE ROWNUM <=#{pageNo}*10)
+WHERE #{pageNo}*10-9 <=RN
+]]>
+</select>
+
+<select id="BoardDetail" parameterType="int" resultType="BoardDto">
+SELECT B_NO,U_ID,B_TITLE,B_CONTENT,B_DATE,B_HITS,(SELECT U_GRADE FROM USERS WHERE U_ID=B.U_ID)AS U_GRADE FROM BOARD B WHERE B_NO=#{b_no}
+</select>
+
+<insert id="BoardInsert" parameterType="BoardDto">
+INSERT INTO BOARD VALUES(BOARDSEQ.NEXTVAL,#{u_id},#{b_title},#{b_content},SYSDATE,0)
+</insert>
+
+<update id="BoardUpdate" parameterType="BoardDto">
+UPDATE BOARD SET B_TITLE=#{b_title}, B_CONTENT=#{b_content}, B_DATE=SYSDATE WHERE B_NO=#{b_no}
+</update>
+
+<delete id="BoardDelete" parameterType="int">
+DELETE FROM BOARD WHERE B_NO=#{b_no}
+</delete>
+
+<select id="BoardSearch" parameterType="map" resultMap="BoardMap">
+<![CDATA[
+SELECT * FROM(SELECT ROWNUM AS RN,A.B_NO,A.U_ID,A.B_TITLE,A.B_CONTENT,A.B_DATE,A.B_HITS, U_GRADE FROM
+(SELECT ROWNUM,B_NO,U_ID,B_TITLE,B_CONTENT,B_DATE,B_HITS, (SELECT U_GRADE FROM USERS WHERE U_ID=B.U_ID)AS U_GRADE FROM BOARD B WHERE UPPER(${option}) LIKE '%' || UPPER(#{input}) || '%' ORDER BY DECODE(U_GRADE, 'ADMIN', U_GRADE), B_NO DESC)A
+WHERE ROWNUM <=#{pageNo}*10)
+WHERE #{pageNo}*10-9 <=RN
+]]>
+</select>
+
+<update id="BoardCount" parameterType="int">
+UPDATE BOARD SET B_HITS=B_HITS+1 WHERE B_NO=#{b_no}
+</update>
+
+<select id="Boardtotal" resultType="int">
+SELECT COUNT(*) FROM BOARD
+</select>
+
+<select id="BoardSearchTotal" parameterType="map" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE UPPER(${option}) LIKE '%' || UPPER(#{input}) || '%'
+</select>
+	
+<delete id="BoardMulDel" parameterType="map">
+DELETE FROM BOARD WHERE B_NO IN
+	<foreach collection="b_no" item="b_no" open="(" separator=","	close=")">
+			#{b_no}
+	</foreach>
+</delete>
+
+</mapper>

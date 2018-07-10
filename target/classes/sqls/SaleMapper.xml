@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.sale">
+
+<resultMap type="com.oz.hj25.dto.SaleDto" id="SaleMap">
+<result column="SAL_NO" property="sal_no"/>
+<result column="I_ID" property="i_id"/>
+<result column="SAL_AMT" property="sal_amt"/>
+<result column="SAL_DATE" property="sal_date"/>
+<result column="G_NAME" property="g_name"/>
+<result column="G_PRICE" property="g_price"/>
+<result column="SEARCH_DATE" property="search_date"/>
+<result column="SEARCH_AVG" property="search_avg"/>
+<result column="G_NO" property="g_no"/>
+</resultMap> 
+
+
+ 
+  <select id="saleList" parameterType="SaleDto" resultMap="SaleMap">
+SELECT S.SAL_NO AS "SAL_NO",
+S.I_ID AS "I_ID",
+S.SAL_AMT AS "SAL_AMT",
+S.SAL_DATE AS "SAL_DATE",
+S.G_NAME AS "G_NAME",
+G.G_PRICE AS "G_PRICE"
+FROM SALE S,GOODS G  
+WHERE S.G_NAME=G.G_NAME AND S.I_ID = #{i_id} AND SUBSTR(S.SAL_DATE,1,8) = #{sal_date}
+
+</select> 
+
+<select id="goodsSearchList" parameterType="map" resultMap="SaleMap">
+<![CDATA[
+SELECT SUBSTR(SAL_DATE,1,5) AS "SEARCH_DATE",
+ ROUND( AVG(SAL_AMT),1) AS "SEARCH_AVG"
+FROM SALE 
+ WHERE G_NAME=#{g_name} AND I_ID=#{i_id} AND SUBSTR(SAL_DATE,1,5) >= #{startDate} AND SUBSTR(SAL_DATE,1,5) <= #{endDate}
+GROUP BY SUBSTR(SAL_DATE,1,5)
+ORDER BY SUBSTR(SAL_DATE,1,5)
+]]>
+</select>
+
+<select id="addrSearchList" parameterType="map"  resultMap="SaleMap">
+<![CDATA[
+SELECT SUBSTR(SAL_DATE,1,5) AS "SEARCH_DATE",
+ ROUND( AVG(SAL_AMT),1) AS "SEARCH_AVG"
+FROM SALE JOIN INFO USING(I_ID)
+ WHERE G_NAME=#{g_name} AND I_ADDR LIKE '%'||#{i_addr}||'%' AND SUBSTR(SAL_DATE,1,5) >= #{startDate}
+ AND SUBSTR(SAL_DATE,1,5) <= #{endDate}
+GROUP BY SUBSTR(SAL_DATE,1,5)
+ORDER BY SUBSTR(SAL_DATE,1,5)
+]]>
+</select>
+ 
+ <select id="autoOrderSearchList" parameterType="String"  resultMap="SaleMap">
+<![CDATA[
+SELECT G.G_NO AS "G_NO",
+ ROUND( AVG(S.SAL_AMT),0) AS "SEARCH_AVG"
+FROM SALE S, GOODS G
+ WHERE  S.G_NAME = G.G_NAME AND
+ S.I_ID=#{i_id} AND SUBSTR(S.SAL_DATE,1,8) >= SYSDATE-7 AND SUBSTR(S.SAL_DATE,1,8) <= SYSDATE
+GROUP BY G.G_NO
+ORDER BY G.G_NO
+]]>
+</select>
+
+<insert id="saleInsert" parameterType="SaleDto">
+INSERT INTO SALE VALUES(SALESEQ.NEXTVAL,#{i_id},#{sal_amt},SYSDATE,#{g_name})
+</insert>
+ 
+<update id="saleUpdate" parameterType="SaleDto">
+UPDATE SALE SET SAL_AMT = #{sal_amt}, SAL_DATE = SYSDATE  WHERE SAL_NO = #{sal_no}
+</update>
+
+<delete id="saleDelete">
+DELETE FROM SALE WHERE SAL_NO = #{sal_no}
+</delete>
+
+<select id="InfoAddr" parameterType="String" resultType="String">
+SELECT I_ADDR FROM INFO WHERE I_ID = #{i_id}
+</select>
+
+</mapper>

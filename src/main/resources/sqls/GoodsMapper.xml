@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oz.hj25.goods">
+<resultMap type="com.oz.hj25.dto.GoodsDto" id="GoodsMap">
+<result column="G_NO" property="g_no"/>
+<result column="CT_NO" property="ct_no"/>
+<result column="G_NAME" property="g_name"/>
+<result column="G_PRICE" property="g_price"/>
+</resultMap>
+
+<select id="goodsList" resultMap="GoodsMap" parameterType="int">
+SELECT * FROM GOODS WHERE CT_NO=#{ct_no}
+</select>
+
+<select id="goodsName" resultMap="GoodsMap" parameterType="String">
+SELECT * FROM GOODS WHERE G_NAME LIKE '%'|| #{o_inputName} || '%'
+</select>
+
+</mapper>
